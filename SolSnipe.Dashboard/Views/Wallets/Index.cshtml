@@ -1,0 +1,86 @@
+﻿@model List<SolSnipe.Dashboard.Models.WalletViewModel>
+@{
+    ViewData["Title"] = "Tracked Wallets";
+}
+
+<div class="page-header">
+    <h1 class="page-title">◉ TRACKED WALLETS</h1>
+    <span class="muted">@Model.Count(w => w.IsActive) active / @Model.Count total</span>
+</div>
+
+<!-- Add wallet form -->
+<div class="panel" style="margin-bottom: 20px">
+    <div class="panel-header"><span>+ ADD WALLET</span></div>
+    <form asp-action="Add" method="post" class="inline-form">
+        <input type="text" name="Address" placeholder="Solana wallet address (base58)"
+               class="input-field" style="width: 420px" required />
+        <input type="text" name="Label" placeholder="Label (e.g. WHALE_01)"
+               class="input-field" style="width: 160px" />
+        <button type="submit" class="btn btn-success">+ ADD</button>
+    </form>
+    <p class="hint">
+        Find top wallets at <a href="https://app.cielo.finance" target="_blank" class="link">cielo.finance</a>
+        or <a href="https://birdeye.so/leaderboard" target="_blank" class="link">birdeye.so/leaderboard</a>
+    </p>
+</div>
+
+<!-- Wallet table -->
+<div class="panel">
+    <table class="data-table">
+        <thead>
+            <tr><th>LABEL</th><th>ADDRESS</th><th>SCORE</th><th>WIN RATE</th><th>AVG WIN</th><th>AVG LOSS</th><th>TRADES</th><th>LAST SCORED</th><th>STATUS</th><th></th></tr>
+        </thead>
+        <tbody>
+            @foreach (var w in Model)
+            {
+                <tr class="@(w.IsActive ? "" : "row-inactive")">
+                    <td><span class="token-symbol">@w.Label</span></td>
+                    <td>
+                        <span class="mono">@w.ShortAddress</span>
+                        <a href="https://solscan.io/account/@w.Address" target="_blank" class="link-icon" title="View on Solscan">↗</a>
+                    </td>
+                    <td>
+                        <div class="score-wrap">
+                            <div class="score-bar @w.ScoreClass" style="width:@w.Score%"></div>
+                            <span class="@w.ScoreClass">@w.Score.ToString("F0")</span>
+                        </div>
+                    </td>
+                    <td class="@(w.WinRate >= 50 ? "positive" : "negative")">@w.WinRate.ToString("F1")%</td>
+                    <td class="positive">+@w.AvgProfitPct.ToString("F1")%</td>
+                    <td class="negative">-@Math.Abs(w.AvgLossPct).ToString("F1")%</td>
+                    <td class="muted">@w.TotalTrades</td>
+                    <td class="muted small">@(w.LastScored == default ? "Never" : w.LastScored.ToString("MMM dd"))</td>
+                    <td>
+                        @if (w.IsActive)
+                        {
+                            <span class="badge active">ACTIVE</span>
+                        }
+                        else
+                        {
+                            <span class="badge inactive">INACTIVE</span>
+                        }
+                    </td>
+                    <td>
+                        @if (w.IsActive)
+                        {
+                            <form asp-action="Remove" method="post" style="display:inline">
+                                <input type="hidden" name="address" value="@w.Address" />
+                                <button class="btn-xs btn-danger"
+                                        onclick="return confirm('Remove @w.Label from tracking?')">
+                                    REMOVE
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="Reactivate" method="post" style="display:inline">
+                                <input type="hidden" name="address" value="@w.Address" />
+                                <button class="btn-xs btn-outline">REACTIVATE</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,212 @@
+﻿@model SolSnipe.Dashboard.Models.DashboardViewModel
+@{
+    ViewData["Title"] = "Overview";
+    ViewBag.BotRunning = Model.BotRunning;
+    ViewBag.PaperTrading = Model.PaperTrading;
+}
+
+<div class="page-header">
+    <h1 class="page-title">⬡ OVERVIEW</h1>
+    <div class="header-controls">
+        @if (Model.PaperTrading)
+        {
+            <span class="paper-banner">🟡 PAPER TRADING — no real funds at risk</span>
+        }
+        <form asp-action="ToggleBot" method="post" style="display:inline">
+            <button type="submit" class="btn @(Model.BotRunning ? "btn-danger" : "btn-success")">
+                @(Model.BotRunning ? "⏹ STOP BOT" : "▶ START BOT")
+            </button>
+        </form>
+        <form asp-action="ToggleMode" method="post" style="display:inline">
+            <button type="submit" class="btn btn-outline"
+                    onclick="return confirm('Switch to @(Model.PaperTrading ? "LIVE" : "PAPER") mode?')">
+                ⇄ @(Model.PaperTrading ? "GO LIVE" : "PAPER MODE")
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Stat cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">TOTAL P&L</div>
+        <div class="stat-value @(Model.TotalPnlUsd >= 0 ? "positive" : "negative")">
+            @(Model.TotalPnlUsd >= 0 ? "+" : "")$@Model.TotalPnlUsd.ToString("F2")
+        </div>
+        <div class="stat-sub">@Model.TotalTradesCount trades total</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">WIN RATE</div>
+        <div class="stat-value @(Model.WinRatePct >= 50 ? "positive" : "negative")">
+            @Model.WinRatePct.ToString("F1")%
+        </div>
+        <div class="stat-sub">Profit factor: @Model.ProfitFactor.ToString("F2")</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">OPEN POSITIONS</div>
+        <div class="stat-value neutral">@Model.OpenPositionCount</div>
+        <div class="stat-sub">Max: @Model.OpenPositionCount / 5</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">TRACKED WALLETS</div>
+        <div class="stat-value neutral">@Model.TrackedWalletCount</div>
+        <div class="stat-sub">@Model.ActiveSignalCount active signals</div>
+    </div>
+    @if (Model.PaperTrading)
+    {
+        <div class="stat-card highlight">
+            <div class="stat-label">VIRTUAL BALANCE</div>
+            <div class="stat-value" id="virtual-balance">@Model.VirtualBalance.ToString("F4") SOL</div>
+            <div class="stat-sub">Paper trading mode</div>
+        </div>
+    }
+</div>
+
+<!-- Open positions + Live signals side by side -->
+<div class="two-col">
+    <div class="panel">
+        <div class="panel-header">
+            <span>▣ OPEN POSITIONS</span>
+            <a asp-controller="Positions" asp-action="Index" class="panel-link">View all →</a>
+        </div>
+        @if (!Model.OpenPositions.Any())
+        {
+            <div class="empty-state">No open positions</div>
+        }
+        else
+        {
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>TOKEN</th>
+                        <th>ENTRY</th>
+                        <th>NOW</th>
+                        <th>P&L</th>
+                        <th>HOLD</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var pos in Model.OpenPositions)
+                    {
+                        <tr id="pos-@pos.Id">
+                            <td>
+                                <span class="token-symbol">@pos.TokenSymbol</span>
+                                @if (pos.IsPaperTrade)
+                                {
+                                    <span class="badge paper">P</span>
+                                }
+                            </td>
+                            <td class="mono">$@pos.EntryPriceUsd.ToString("F8")</td>
+                            <td class="mono" id="price-@pos.Id">
+                                @(pos.CurrentPriceUsd.HasValue ? "$" + pos.CurrentPriceUsd.Value.ToString("F8") : "—")
+                            </td>
+                            <td class="@pos.PnlClass mono" id="pnl-@pos.Id">
+                                @pos.PnlSign@pos.PnlPct?.ToString("F1")%
+                            </td>
+                            <td class="muted">@pos.HoldTime</td>
+                            <td>
+                                <form asp-controller="Positions" asp-action="Close" method="post">
+                                    <input type="hidden" name="id" value="@pos.Id" />
+                                    <button class="btn-xs btn-danger"
+                                            onclick="return confirm('Close @pos.TokenSymbol position?')">
+                                        CLOSE
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">
+            <span>◎ LIVE SIGNALS</span>
+            <a asp-controller="Signals" asp-action="Index" class="panel-link">View all →</a>
+        </div>
+        @if (!Model.LiveSignals.Any())
+        {
+            <div class="empty-state">Watching wallets — no signals yet</div>
+        }
+        else
+        {
+            <div id="signals-list">
+                @foreach (var sig in Model.LiveSignals.Take(8))
+                {
+                    <div class="signal-row @sig.StrengthClass">
+                        <div class="signal-token">@sig.TokenSymbol</div>
+                        <div class="signal-bar-wrap">
+                            <div class="signal-bar" style="width:@sig.SignalStrengthPct%"></div>
+                        </div>
+                        <div class="signal-meta">
+                            <span class="@(sig.TriggeredBuy ? "triggered" : "")">
+                                @sig.BuyerCount/@sig.TotalWallets
+                            </span>
+                            <span class="muted">@sig.FirstSeen</span>
+                        </div>
+                        @if (sig.TriggeredBuy)
+                        {
+                            <span class="badge triggered">TRIGGERED</span>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Recent trades -->
+<div class="panel" style="margin-top: 20px">
+    <div class="panel-header">
+        <span>≡ RECENT TRADES</span>
+        <a asp-controller="Positions" asp-action="History" class="panel-link">Full history →</a>
+    </div>
+    @if (!Model.RecentTrades.Any())
+    {
+        <div class="empty-state">No closed trades yet</div>
+    }
+    else
+    {
+        <table class="data-table">
+            <thead>
+                <tr><th>TOKEN</th><th>ENTRY</th><th>EXIT</th><th>P&L %</th><th>P&L $</th><th>HOLD</th><th>REASON</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var trade in Model.RecentTrades)
+                {
+                    <tr>
+                        <td><span class="token-symbol">@trade.TokenSymbol</span></td>
+                        <td class="mono">$@trade.EntryPriceUsd.ToString("F8")</td>
+                        <td class="mono">$@(trade.ExitPriceUsd.HasValue ? trade.ExitPriceUsd.Value.ToString("F8") : "—")</td>
+                        <td class="@trade.PnlClass mono">@trade.PnlSign@trade.PnlPct?.ToString("F1")%</td>
+                        <td class="@trade.PnlClass mono">@trade.PnlSign$@trade.PnlUsd?.ToString("F2")</td>
+                        <td class="muted">@trade.HoldTime</td>
+                        <td class="muted">@trade.ExitReason</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-refresh live P&L every 15 seconds
+        setInterval(async () => {
+            const res  = await fetch('/Dashboard/LivePnl');
+            const data = await res.json();
+            data.forEach(p => {
+                const priceEl = document.getElementById('price-' + p.id);
+                const pnlEl   = document.getElementById('pnl-' + p.id);
+                if (priceEl) priceEl.textContent = '$' + p.currentPrice.toFixed(8);
+                if (pnlEl) {
+                    const sign = p.pnlPct >= 0 ? '+' : '';
+                    pnlEl.textContent = sign + p.pnlPct.toFixed(1) + '%';
+                    pnlEl.className = 'mono ' + (p.pnlPct >= 0 ? 'positive' : 'negative');
+                }
+            });
+        }, 15000);
+    </script>
+}

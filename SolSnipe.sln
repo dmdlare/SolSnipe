@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35825.156 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolSnipe.Bot", "SolSnipe.Bot\SolSnipe.Bot.csproj", "{87055198-9188-4AC0-9411-16885BA01349}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolSnipe.Core", "SolSnipe.Core\SolSnipe.Core.csproj", "{FD11C24C-F3B5-45B8-98CE-9B67AAF9A721}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolSnipe.Data", "SolSnipe.Data\SolSnipe.Data.csproj", "{F74CE9EB-193D-4250-88ED-B0D97025AFC4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolSnipe.Api", "SolSnipe.Api\SolSnipe.Api.csproj", "{6E19C92A-2787-467A-B0BF-1B04F83BF0B6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolSnipe.Dashboard", "SolSnipe.Dashboard\SolSnipe.Dashboard.csproj", "{0FFD8071-593A-4773-A250-7C49F74D8917}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolSnipe.Tests", "SolSnipe.Tests\SolSnipe.Tests.csproj", "{4BED3B5D-EEE0-471C-A188-30C867ED1B18}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{87055198-9188-4AC0-9411-16885BA01349}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87055198-9188-4AC0-9411-16885BA01349}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87055198-9188-4AC0-9411-16885BA01349}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87055198-9188-4AC0-9411-16885BA01349}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD11C24C-F3B5-45B8-98CE-9B67AAF9A721}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD11C24C-F3B5-45B8-98CE-9B67AAF9A721}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD11C24C-F3B5-45B8-98CE-9B67AAF9A721}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD11C24C-F3B5-45B8-98CE-9B67AAF9A721}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F74CE9EB-193D-4250-88ED-B0D97025AFC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F74CE9EB-193D-4250-88ED-B0D97025AFC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F74CE9EB-193D-4250-88ED-B0D97025AFC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F74CE9EB-193D-4250-88ED-B0D97025AFC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E19C92A-2787-467A-B0BF-1B04F83BF0B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E19C92A-2787-467A-B0BF-1B04F83BF0B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E19C92A-2787-467A-B0BF-1B04F83BF0B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E19C92A-2787-467A-B0BF-1B04F83BF0B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FFD8071-593A-4773-A250-7C49F74D8917}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FFD8071-593A-4773-A250-7C49F74D8917}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FFD8071-593A-4773-A250-7C49F74D8917}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FFD8071-593A-4773-A250-7C49F74D8917}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BED3B5D-EEE0-471C-A188-30C867ED1B18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BED3B5D-EEE0-471C-A188-30C867ED1B18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BED3B5D-EEE0-471C-A188-30C867ED1B18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BED3B5D-EEE0-471C-A188-30C867ED1B18}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C557DC17-634D-4759-A5B2-579B62A7E5C3}
+	EndGlobalSection
+EndGlobal

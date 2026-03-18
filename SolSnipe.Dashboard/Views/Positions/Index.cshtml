@@ -1,0 +1,104 @@
+﻿@model List<SolSnipe.Dashboard.Models.PositionViewModel>
+@{
+    ViewData["Title"] = "Open Positions";
+}
+
+<div class="page-header">
+    <h1 class="page-title">▣ OPEN POSITIONS</h1>
+    <span class="muted">@Model.Count position(s) open</span>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="panel">
+        <div class="empty-state">No open positions. Bot is watching for signals...</div>
+    </div>
+}
+else
+{
+    <div class="panel">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>TOKEN</th>
+                    <th>ENTRY PRICE</th>
+                    <th>CURRENT</th>
+                    <th>P&L %</th>
+                    <th>P&L USD</th>
+                    <th>AMOUNT SOL</th>
+                    <th>SIGNAL STR</th>
+                    <th>HOLD TIME</th>
+                    <th>TYPE</th>
+                    <th>ACTION</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pos in Model)
+                {
+                    <tr id="pos-row-@pos.Id">
+                        <td>
+                            <div class="token-symbol">@pos.TokenSymbol</div>
+                            <div class="mono muted small">@pos.TokenMint[..8]...</div>
+                        </td>
+                        <td class="mono">$@pos.EntryPriceUsd.ToString("F8")</td>
+                        <td class="mono" id="cur-@pos.Id">
+                            @(pos.CurrentPriceUsd.HasValue ? "$" + pos.CurrentPriceUsd.Value.ToString("F8") : "—")
+                        </td>
+                        <td class="@pos.PnlClass mono" id="pct-@pos.Id">
+                            @pos.PnlSign@pos.PnlPct?.ToString("F1")%
+                        </td>
+                        <td class="@pos.PnlClass mono" id="usd-@pos.Id">
+                            @pos.PnlSign$@pos.PnlUsd?.ToString("F2")
+                        </td>
+                        <td class="mono">@pos.AmountSolSpent.ToString("F3")</td>
+                        <td>
+                            <div class="mini-bar-wrap">
+                                <div class="mini-bar" style="width:@pos.SignalStrengthPct%"></div>
+                            </div>
+                            <span class="muted small">@pos.SignalStrengthPct.ToString("F0")%</span>
+                        </td>
+                        <td class="muted">@pos.HoldTime</td>
+                        <td>
+                            @if (pos.IsPaperTrade)
+                            {
+                                <span class="badge paper">PAPER</span>
+                            }
+                            else
+                            {
+                                <span class="badge live">LIVE</span>
+                            }
+                        </td>
+                        <td>
+                            <form asp-action="Close" method="post">
+                                <input type="hidden" name="id" value="@pos.Id" />
+                                <button class="btn-sm btn-danger"
+                                        onclick="return confirm('Manually close @pos.TokenSymbol?\nThis will execute a real sell.')">
+                                    CLOSE
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        setInterval(async () => {
+            const res  = await fetch('/Dashboard/LivePnl');
+            const data = await res.json();
+            data.forEach(p => {
+                const cur = document.getElementById('cur-' + p.id);
+                const pct = document.getElementById('pct-' + p.id);
+                const usd = document.getElementById('usd-' + p.id);
+                const sign = p.pnlPct >= 0 ? '+' : '';
+                const cls  = 'mono ' + (p.pnlPct >= 0 ? 'positive' : 'negative');
+                if (cur) cur.textContent = '$' + p.currentPrice.toFixed(8);
+                if (pct) { pct.textContent = sign + p.pnlPct.toFixed(1) + '%'; pct.className = cls; }
+                if (usd) { usd.textContent = sign + '$' + p.pnlUsd.toFixed(2); usd.className = cls; }
+            });
+        }, 10000);
+    </script>
+}

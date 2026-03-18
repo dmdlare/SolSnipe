@@ -1,0 +1,1083 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — SolSnipe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ─── FONTS & RESET ─────────────────────────────────────── */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #050c14;
+            --bg2: #091420;
+            --bg3: #0d1e30;
+            --border: #0e2d47;
+            --border2: #1a4060;
+            --green: #00ffa3;
+            --green-dim: #00c87d;
+            --red: #ff4466;
+            --yellow: #ffd600;
+            --blue: #00aaff;
+            --muted: #3d6080;
+            --text: #a8c8e0;
+            --text-bright: #d4eaf8;
+            --mono: 'Share Tech Mono', monospace;
+            --sans: 'Rajdhani', sans-serif;
+        }
+
+        html, body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            font-size: 14px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ─── SCAN LINE EFFECT ───────────────────────────────────── */
+        .scan-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--green), transparent);
+            animation: scan 4s linear infinite;
+            z-index: 1000;
+            opacity: 0.4;
+        }
+
+        @@keyframes scan {
+            0% {
+                top: 0;
+            }
+
+            100% {
+                top: 100vh;
+            }
+        }
+
+        /* ─── NAVBAR ─────────────────────────────────────────────── */
+        .navbar {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding: 12px 32px;
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            font-size: 22px;
+            color: var(--green);
+        }
+
+        .brand-name {
+            font-family: var(--mono);
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--green);
+            letter-spacing: 3px;
+        }
+
+        .brand-sub {
+            font-size: 9px;
+            color: var(--muted);
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 4px;
+            flex: 1;
+            margin-left: 32px;
+        }
+
+        .nav-link {
+            padding: 6px 14px;
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: var(--muted);
+            text-decoration: none;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            transition: all 0.15s;
+        }
+
+            .nav-link:hover {
+                color: var(--text);
+                border-color: var(--border2);
+            }
+
+            .nav-link.active {
+                color: var(--green);
+                border-color: var(--green);
+                background: rgba(0,255,163,0.05);
+            }
+
+        .nav-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: var(--muted);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--muted);
+            transition: all 0.3s;
+        }
+
+            .status-dot.active {
+                background: var(--green);
+                box-shadow: 0 0 8px var(--green);
+                animation: pulse-dot 2s infinite;
+            }
+
+        @@keyframes pulse-dot {
+            0%, 100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        .mode-badge {
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+
+            .mode-badge.paper {
+                background: rgba(255,214,0,0.12);
+                color: var(--yellow);
+                border: 1px solid rgba(255,214,0,0.3);
+            }
+
+            .mode-badge.live {
+                background: rgba(255,68,102,0.12);
+                color: var(--red);
+                border: 1px solid rgba(255,68,102,0.3);
+            }
+
+        /* ─── LAYOUT ─────────────────────────────────────────────── */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 32px 80px;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-family: var(--mono);
+            font-size: 18px;
+            color: var(--green);
+            letter-spacing: 3px;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* ─── PANELS ─────────────────────────────────────────────── */
+        .panel {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 18px;
+            background: var(--bg3);
+            border-bottom: 1px solid var(--border);
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: var(--text);
+        }
+
+        .panel-link {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 11px;
+            transition: color 0.15s;
+        }
+
+            .panel-link:hover {
+                color: var(--green);
+            }
+
+        .empty-state {
+            padding: 32px;
+            text-align: center;
+            color: var(--muted);
+            font-family: var(--mono);
+            font-size: 12px;
+        }
+
+        /* ─── STATS GRID ─────────────────────────────────────────── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 18px 20px;
+            transition: border-color 0.2s;
+        }
+
+            .stat-card:hover {
+                border-color: var(--border2);
+            }
+
+            .stat-card.highlight {
+                border-color: rgba(255,214,0,0.3);
+            }
+
+        .stat-label {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: 2px;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-family: var(--mono);
+            font-size: 26px;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--text-bright);
+        }
+
+        .stat-sub {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+
+        /* ─── TABLES ─────────────────────────────────────────────── */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+            .data-table thead tr {
+                background: var(--bg3);
+                border-bottom: 1px solid var(--border);
+            }
+
+            .data-table th {
+                padding: 10px 14px;
+                font-family: var(--mono);
+                font-size: 9px;
+                letter-spacing: 2px;
+                color: var(--muted);
+                text-align: left;
+                font-weight: normal;
+            }
+
+            .data-table td {
+                padding: 11px 14px;
+                border-bottom: 1px solid rgba(14,45,71,0.5);
+                vertical-align: middle;
+            }
+
+            .data-table tbody tr:hover {
+                background: rgba(255,255,255,0.02);
+            }
+
+            .data-table tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+        .row-inactive {
+            opacity: 0.4;
+        }
+
+        /* ─── COLORS ─────────────────────────────────────────────── */
+        .positive {
+            color: var(--green);
+        }
+
+        .negative {
+            color: var(--red);
+        }
+
+        .neutral {
+            color: var(--text-bright);
+        }
+
+        .warning {
+            color: var(--yellow);
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        .mono {
+            font-family: var(--mono);
+        }
+
+        .small {
+            font-size: 11px;
+        }
+
+        .token-symbol {
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-bright);
+            letter-spacing: 1px;
+        }
+
+        /* ─── BUTTONS ─────────────────────────────────────────────── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 18px;
+            border: 1px solid;
+            border-radius: 4px;
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.15s;
+            background: transparent;
+        }
+
+        .btn-success {
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+            .btn-success:hover {
+                background: rgba(0,255,163,0.1);
+            }
+
+        .btn-danger {
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+            .btn-danger:hover {
+                background: rgba(255,68,102,0.1);
+            }
+
+        .btn-outline {
+            border-color: var(--border2);
+            color: var(--text);
+        }
+
+            .btn-outline:hover {
+                border-color: var(--text);
+            }
+
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 10px;
+        }
+
+        .btn-xs {
+            padding: 3px 8px;
+            font-size: 9px;
+            border-radius: 3px;
+            border: 1px solid;
+            cursor: pointer;
+            background: transparent;
+            font-family: var(--mono);
+            letter-spacing: 1px;
+        }
+
+            .btn-xs.btn-danger {
+                border-color: rgba(255,68,102,0.4);
+                color: var(--red);
+            }
+
+                .btn-xs.btn-danger:hover {
+                    background: rgba(255,68,102,0.1);
+                }
+
+            .btn-xs.btn-outline {
+                border-color: var(--border2);
+                color: var(--muted);
+            }
+
+        /* ─── BADGES ─────────────────────────────────────────────── */
+        .badge {
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 3px;
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: 1px;
+        }
+
+            .badge.paper {
+                background: rgba(255,214,0,0.12);
+                color: var(--yellow);
+            }
+
+            .badge.live {
+                background: rgba(255,68,102,0.12);
+                color: var(--red);
+            }
+
+            .badge.triggered {
+                background: rgba(0,255,163,0.12);
+                color: var(--green);
+            }
+
+            .badge.watching {
+                background: rgba(0,170,255,0.1);
+                color: var(--blue);
+            }
+
+            .badge.active {
+                background: rgba(0,255,163,0.1);
+                color: var(--green);
+            }
+
+            .badge.inactive {
+                background: transparent;
+                color: var(--muted);
+                border: 1px solid var(--border);
+            }
+
+        /* ─── SIGNALS ─────────────────────────────────────────────── */
+        .signal-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 18px;
+            border-bottom: 1px solid rgba(14,45,71,0.5);
+        }
+
+            .signal-row:last-child {
+                border-bottom: none;
+            }
+
+        .signal-token {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text-bright);
+            width: 80px;
+        }
+
+        .signal-bar-wrap {
+            flex: 1;
+            height: 4px;
+            background: var(--bg3);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .signal-bar {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.5s;
+        }
+
+        .signal-row.high .signal-bar {
+            background: var(--green);
+        }
+
+        .signal-row.medium .signal-bar {
+            background: var(--yellow);
+        }
+
+        .signal-row.low .signal-bar {
+            background: var(--blue);
+        }
+
+        .signal-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+            font-family: var(--mono);
+            font-size: 10px;
+        }
+
+        .triggered {
+            color: var(--green);
+        }
+
+        .signal-card {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px 18px;
+            margin: 12px 16px;
+            background: rgba(0,0,0,0.2);
+            transition: border-color 0.2s;
+        }
+
+            .signal-card.high {
+                border-color: rgba(0,255,163,0.2);
+            }
+
+            .signal-card.medium {
+                border-color: rgba(255,214,0,0.2);
+            }
+
+            .signal-card.triggered {
+                border-color: var(--green);
+                background: rgba(0,255,163,0.03);
+            }
+
+        .signal-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .signal-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .signal-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .signal-bar-track {
+            flex: 1;
+            height: 6px;
+            background: var(--bg3);
+            border-radius: 3px;
+            overflow: visible;
+            position: relative;
+        }
+
+        .signal-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s;
+        }
+
+            .signal-bar-fill.high {
+                background: var(--green);
+                box-shadow: 0 0 8px rgba(0,255,163,0.4);
+            }
+
+            .signal-bar-fill.medium {
+                background: var(--yellow);
+            }
+
+            .signal-bar-fill.low {
+                background: var(--blue);
+            }
+
+        .signal-threshold-marker {
+            position: absolute;
+            top: -4px;
+            bottom: -4px;
+            width: 2px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 1px;
+        }
+
+        .signal-pct {
+            font-family: var(--mono);
+            font-size: 16px;
+            font-weight: 700;
+            width: 48px;
+            text-align: right;
+        }
+
+            .signal-pct.high {
+                color: var(--green);
+            }
+
+            .signal-pct.medium {
+                color: var(--yellow);
+            }
+
+            .signal-pct.low {
+                color: var(--blue);
+            }
+
+        .signal-card-footer {
+            display: flex;
+            gap: 20px;
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--muted);
+        }
+
+        /* ─── SCORE BAR ─────────────────────────────────────────── */
+        .score-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .score-bar {
+            height: 4px;
+            border-radius: 2px;
+            min-width: 4px;
+            transition: width 0.5s;
+        }
+
+            .score-bar.high {
+                background: var(--green);
+            }
+
+            .score-bar.medium {
+                background: var(--yellow);
+            }
+
+            .score-bar.low {
+                background: var(--red);
+            }
+
+        .high {
+            color: var(--green);
+        }
+
+        .medium {
+            color: var(--yellow);
+        }
+
+        .low {
+            color: var(--red);
+        }
+
+        /* ─── MINI BAR ───────────────────────────────────────────── */
+        .mini-bar-wrap {
+            height: 3px;
+            width: 80px;
+            background: var(--bg3);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 3px;
+        }
+
+        .mini-bar {
+            height: 100%;
+            background: var(--blue);
+            border-radius: 2px;
+        }
+
+        /* ─── FORMS ─────────────────────────────────────────────── */
+        .input-field {
+            background: var(--bg3);
+            border: 1px solid var(--border2);
+            border-radius: 4px;
+            padding: 8px 12px;
+            color: var(--text-bright);
+            font-family: var(--mono);
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+            .input-field:focus {
+                border-color: var(--green);
+            }
+
+            .input-field::placeholder {
+                color: var(--muted);
+            }
+
+        .inline-form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 18px;
+            flex-wrap: wrap;
+        }
+
+        .hint {
+            padding: 0 18px 14px;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .link {
+            color: var(--blue);
+            text-decoration: none;
+        }
+
+            .link:hover {
+                color: var(--green);
+            }
+
+        .link-icon {
+            margin-left: 6px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 11px;
+        }
+
+            .link-icon:hover {
+                color: var(--blue);
+            }
+
+        /* ─── ALERTS ─────────────────────────────────────────────── */
+        .alert {
+            padding: 10px 16px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            font-family: var(--mono);
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .alert-success {
+            background: rgba(0,255,163,0.08);
+            border: 1px solid rgba(0,255,163,0.2);
+            color: var(--green);
+        }
+
+        .alert-error {
+            background: rgba(255,68,102,0.08);
+            border: 1px solid rgba(255,68,102,0.2);
+            color: var(--red);
+        }
+
+        /* ─── PAPER BANNER ───────────────────────────────────────── */
+        .paper-banner {
+            padding: 6px 14px;
+            background: rgba(255,214,0,0.08);
+            border: 1px solid rgba(255,214,0,0.25);
+            border-radius: 4px;
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--yellow);
+            letter-spacing: 1px;
+        }
+
+        /* ─── VERDICT BAR ────────────────────────────────────────── */
+        .verdict-bar {
+            padding: 14px 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-family: var(--mono);
+            font-size: 13px;
+            letter-spacing: 1px;
+            border: 1px solid;
+        }
+
+            .verdict-bar.positive {
+                background: rgba(0,255,163,0.06);
+                border-color: rgba(0,255,163,0.2);
+                color: var(--green);
+            }
+
+            .verdict-bar.negative {
+                background: rgba(255,68,102,0.06);
+                border-color: rgba(255,68,102,0.2);
+                color: var(--red);
+            }
+
+            .verdict-bar.warning {
+                background: rgba(255,214,0,0.06);
+                border-color: rgba(255,214,0,0.2);
+                color: var(--yellow);
+            }
+
+            .verdict-bar.muted {
+                background: var(--bg2);
+                border-color: var(--border);
+                color: var(--muted);
+            }
+
+        /* ─── PAGINATION ─────────────────────────────────────────── */
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            font-family: var(--mono);
+            font-size: 11px;
+        }
+
+        /* ─── LOG TICKER ─────────────────────────────────────────── */
+        .log-ticker {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 28px;
+            background: var(--bg3);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            font-family: var(--mono);
+            font-size: 10px;
+            gap: 12px;
+            z-index: 200;
+            overflow: hidden;
+        }
+
+        .ticker-label {
+            color: var(--green);
+            letter-spacing: 2px;
+            font-size: 9px;
+            flex-shrink: 0;
+            border: 1px solid rgba(0,255,163,0.3);
+            padding: 1px 5px;
+            border-radius: 2px;
+        }
+
+        #ticker-content {
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ─── SCROLLBAR ──────────────────────────────────────────── */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg2);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border2);
+            border-radius: 3px;
+        }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: var(--muted);
+            }
+
+    </style>
+</head>
+<body>
+
+    <div class="scan-line"></div>
+
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="brand-icon">◈</span>
+            <span class="brand-name">SOLSNIPE</span>
+            <span class="brand-sub">COPY TRADE BOT</span>
+        </div>
+        <div class="nav-links">
+            <a asp-controller="Dashboard" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active" : "")">
+                ⬡ OVERVIEW
+            </a>
+            <a asp-controller="Signals" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Signals" ? "active" : "")">
+                ◎ SIGNALS
+            </a>
+            <a asp-controller="Positions" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Positions" ? "active" : "")">
+                ▣ POSITIONS
+            </a>
+            <a asp-controller="Positions" asp-action="History" class="nav-link">
+                ≡ HISTORY
+            </a>
+            <a asp-controller="Wallets" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Wallets" ? "active" : "")">
+                ◉ WALLETS
+            </a>
+        </div>
+        <div class="nav-status">
+            <div id="bot-status-dot" class="status-dot @(ViewBag.BotRunning == true ? "active" : "")"></div>
+            <span id="bot-status-text">@(ViewBag.BotRunning == true ? "LIVE" : "OFFLINE")</span>
+            <span class="mode-badge @(ViewBag.PaperTrading == true ? "paper" : "live")">
+                @(ViewBag.PaperTrading == true ? "PAPER" : "LIVE")
+            </span>
+        </div>
+    </nav>
+
+    <div class="container">
+        @if (TempData["Message"] != null)
+        {
+            <div class="alert alert-success">▶ @TempData["Message"]</div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-error">✕ @TempData["Error"]</div>
+        }
+
+        @RenderBody()
+    </div>
+
+    <div id="log-ticker" class="log-ticker">
+        <span class="ticker-label">LOG</span>
+        <div id="ticker-content">Connecting to bot...</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script>
+        // ─── SignalR connection ────────────────────────────────────
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/hub/dashboard")
+            .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
+            .configureLogging(signalR.LogLevel.Warning)
+            .build();
+
+        // ─── Event handlers ────────────────────────────────────────
+        connection.on("Connected", (data) => {
+            updateTicker("Connected to SolSnipe dashboard ✓");
+        });
+
+        connection.on("SignalUpdate", (signal) => {
+            updateTicker(`Signal: ${signal.tokenSymbol} — ${signal.buyerCount}/${signal.totalWallets} wallets (${signal.signalStrengthPct.toFixed(0)}%)`);
+        });
+
+        connection.on("PositionUpdate", (position) => {
+            updateTicker(`Position opened: ${position.tokenSymbol} @@$${position.entryPriceUsd.toFixed(8)}`);
+        });
+
+        connection.on("PositionClosed", (position) => {
+            const sign = (position.pnlPct ?? 0) >= 0 ? "+" : "";
+            updateTicker(`Closed: ${position.tokenSymbol} ${sign}${position.pnlPct?.toFixed(1)}% / $${position.pnlUsd?.toFixed(2)}`);
+            const row = document.getElementById("pos-" + position.id);
+            if (row) {
+                row.style.transition = "opacity 1s";
+                row.style.opacity = "0.3";
+                setTimeout(() => row.remove(), 1200);
+            }
+        });
+
+        connection.on("PriceUpdate", ({ tokenMint, price, pnlPct }) => {
+            const priceEl = document.getElementById("price-" + tokenMint);
+            const pnlEl   = document.getElementById("pnl-"   + tokenMint);
+            if (priceEl) priceEl.textContent = "$" + price.toFixed(8);
+            if (pnlEl) {
+                pnlEl.textContent = (pnlPct >= 0 ? "+" : "") + pnlPct.toFixed(1) + "%";
+                pnlEl.className   = "mono " + (pnlPct >= 0 ? "positive" : "negative");
+            }
+        });
+
+        connection.on("BalanceUpdate", ({ virtualBalance }) => {
+            const el = document.getElementById("virtual-balance");
+            if (el) el.textContent = virtualBalance.toFixed(4) + " SOL";
+        });
+
+        connection.on("BotStatusChange", ({ running, paperTrading }) => {
+            const dot  = document.getElementById("bot-status-dot");
+            const text = document.getElementById("bot-status-text");
+            if (dot)  dot.className  = "status-dot" + (running ? " active" : "");
+            if (text) text.textContent = running ? "LIVE" : "OFFLINE";
+            updateTicker(running ? "Bot started" : "Bot stopped");
+        });
+
+        connection.on("LogMessage", ({ level, message, time }) => {
+            updateTicker(`[${time}] ${message}`);
+        });
+
+        // ─── Connection lifecycle ──────────────────────────────────
+        connection.onreconnecting(() => {
+            updateTicker("Reconnecting...");
+            setStatusIndicator(false);
+        });
+
+        connection.onreconnected(() => {
+            updateTicker("Reconnected ✓");
+            setStatusIndicator(true);
+        });
+
+        connection.onclose(() => {
+            updateTicker("Disconnected — refresh page to reconnect");
+            setStatusIndicator(false);
+        });
+
+        // ─── Start ─────────────────────────────────────────────────
+        async function startConnection() {
+            try {
+                await connection.start();
+                updateTicker("Dashboard connected ✓");
+                setStatusIndicator(true);
+            } catch (err) {
+                updateTicker("Could not connect to hub — retrying in 5s");
+                setTimeout(startConnection, 5000);
+            }
+        }
+
+        startConnection();
+
+        // ─── Helpers ───────────────────────────────────────────────
+        function setStatusIndicator(connected) {
+            const ticker = document.getElementById("ticker-content");
+            if (ticker && !connected) ticker.style.color = "var(--muted)";
+            if (ticker && connected)  ticker.style.color  = "";
+        }
+
+        const tickerMessages = [];
+        let tickerIdx = 0;
+
+        function updateTicker(msg) {
+            tickerMessages.push(msg);
+            if (tickerMessages.length > 50) tickerMessages.shift();
+            const el = document.getElementById("ticker-content");
+            if (el) el.textContent = msg;
+        }
+
+        // Cycle through recent messages every 8 seconds
+        setInterval(() => {
+            if (tickerMessages.length < 2) return;
+            tickerIdx = (tickerIdx + 1) % tickerMessages.length;
+            const el  = document.getElementById("ticker-content");
+            if (el)  el.textContent = tickerMessages[tickerIdx];
+        }, 8000);
+
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

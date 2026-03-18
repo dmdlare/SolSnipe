@@ -1,0 +1,68 @@
+﻿@model List<SolSnipe.Dashboard.Models.SignalViewModel>
+@{
+    ViewData["Title"] = "Live Signals";
+}
+
+<div class="page-header">
+    <h1 class="page-title">◎ LIVE SIGNALS</h1>
+    <span class="muted" id="signal-count">@Model.Count signal(s) active</span>
+</div>
+
+<div class="panel" id="signals-panel">
+    @if (!Model.Any())
+    {
+        <div class="empty-state" id="empty-msg">Watching wallets — no signals detected yet</div>
+    }
+
+    <div id="signals-container">
+        @foreach (var sig in Model.OrderByDescending(s => s.SignalStrengthPct))
+        {
+            <div class="signal-card @sig.StrengthClass @(sig.TriggeredBuy ? "triggered" : "")">
+                <div class="signal-card-header">
+                    <div>
+                        <span class="token-symbol">@sig.TokenSymbol</span>
+                        <span class="mono muted small"> @sig.TokenMint[..8]...</span>
+                    </div>
+                    <div class="signal-right">
+                        @if (sig.TriggeredBuy)
+                        {
+                            <span class="badge triggered">✓ BUY TRIGGERED</span>
+                        }
+                        else
+                        {
+                            <span class="badge watching">WATCHING</span>
+                        }
+                    </div>
+                </div>
+                <div class="signal-bar-row">
+                    <div class="signal-bar-track">
+                        <div class="signal-bar-fill @sig.StrengthClass"
+                             style="width:@sig.SignalStrengthPct%"></div>
+                        <div class="signal-threshold-marker" style="left:60%"></div>
+                    </div>
+                    <span class="signal-pct @sig.StrengthClass">@sig.SignalStrengthPct.ToString("F0")%</span>
+                </div>
+                <div class="signal-card-footer">
+                    <span>@sig.BuyerCount / @sig.TotalWallets wallets bought</span>
+                    <span class="muted">First seen: @sig.FirstSeen</span>
+                    <span class="muted">Updated: @sig.LastUpdated</span>
+                    @if (sig.PriceAtSignal.HasValue)
+                    {
+                        <span class="muted">Price at signal: $@sig.PriceAtSignal.Value.ToString("F8")</span>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Poll signals every 5 seconds
+        setInterval(async () => {
+            const res  = await fetch('/Signals/Live');
+            const data = await res.json();
+            document.getElementById('signal-count').textContent = data.length + ' signal(s) active';
+        }, 5000);
+    </script>
+}

@@ -1,0 +1,113 @@
+﻿@model SolSnipe.Dashboard.Models.StatsViewModel
+@{
+    ViewData["Title"] = "Trade History";
+}
+
+<div class="page-header">
+    <h1 class="page-title">≡ TRADE HISTORY & STATS</h1>
+</div>
+
+<!-- Performance stats -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">TOTAL P&L</div>
+        <div class="stat-value @(Model.TotalPnlUsd >= 0 ? "positive" : "negative")">
+            @(Model.TotalPnlUsd >= 0 ? "+" : "")$@Model.TotalPnlUsd.ToString("F2")
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">WIN RATE</div>
+        <div class="stat-value @(Model.WinRatePct >= 50 ? "positive" : "negative")">
+            @Model.WinRatePct.ToString("F1")%
+        </div>
+        <div class="stat-sub">@Model.WinningTrades W / @Model.LosingTrades L</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">AVG WIN</div>
+        <div class="stat-value positive">+@Model.AvgWinPct.ToString("F1")%</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">AVG LOSS</div>
+        <div class="stat-value negative">-@Math.Abs(Model.AvgLossPct).ToString("F1")%</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">BEST TRADE</div>
+        <div class="stat-value positive">+$@Model.BestTradePnlUsd.ToString("F2")</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">WORST TRADE</div>
+        <div class="stat-value negative">-$@Math.Abs(Model.WorstTradePnlUsd).ToString("F2")</div>
+    </div>
+</div>
+
+<!-- Verdict bar -->
+@{
+    var pf = Model.TotalTrades == 0 ? 0 : Model.ProfitFactor;
+    var verdict = Model.TotalTrades < 10 ? ("⏳ NOT ENOUGH DATA", "muted")
+        : pf >= 2.0 && Model.WinRatePct >= 55 ? ("✅ STRONG — Ready to go live", "positive")
+        : pf >= 1.5 ? ("✅ DECENT — Profitable, start small", "positive")
+        : pf >= 1.0 ? ("⚠️  MARGINAL — Tune settings before going live", "warning")
+        : ("❌ UNPROFITABLE — Do not go live yet", "negative");
+}
+<div class="verdict-bar @verdict.Item2">
+    @verdict.Item1
+    @if (Model.TotalTrades >= 10)
+    {
+        <span class="muted"> — Profit Factor: @pf.ToString("F2")</span>
+    }
+</div>
+
+<!-- Trade table -->
+<div class="panel" style="margin-top: 20px">
+    <div class="panel-header"><span>CLOSED TRADES</span></div>
+    @if (!Model.RecentTrades.Any())
+    {
+        <div class="empty-state">No closed trades yet.</div>
+    }
+    else
+    {
+        <table class="data-table">
+            <thead>
+                <tr><th>#</th><th>TOKEN</th><th>ENTRY</th><th>EXIT</th><th>P&L %</th><th>P&L $</th><th>HOLD</th><th>EXIT REASON</th><th>TYPE</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var (trade, i) in Model.RecentTrades.Select((t, i) => (t, i + 1)))
+                {
+                    <tr>
+                        <td class="muted">@i</td>
+                        <td><span class="token-symbol">@trade.TokenSymbol</span></td>
+                        <td class="mono">$@trade.EntryPriceUsd.ToString("F8")</td>
+                        <td class="mono">$@(trade.ExitPriceUsd.HasValue ? trade.ExitPriceUsd.Value.ToString("F8") : "—")</td>
+                        <td class="@trade.PnlClass mono">@trade.PnlSign@trade.PnlPct?.ToString("F1")%</td>
+                        <td class="@trade.PnlClass mono">@trade.PnlSign$@trade.PnlUsd?.ToString("F2")</td>
+                        <td class="muted">@trade.HoldTime</td>
+                        <td class="muted">@trade.ExitReason</td>
+                        <td>
+                            @if (trade.IsPaperTrade)
+                            {
+                                <span class="badge paper">PAPER</span>
+                            }
+                            else
+                            {
+                                <span class="badge live">LIVE</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            @if (ViewBag.Page > 1)
+            {
+                <a asp-action="History" asp-route-page="@(ViewBag.Page - 1)" class="btn-sm btn-outline">← PREV</a>
+            }
+            <span class="muted">Page @ViewBag.Page of @ViewBag.TotalPages</span>
+            @if (ViewBag.Page < ViewBag.TotalPages)
+            {
+                <a asp-action="History" asp-route-page="@(ViewBag.Page + 1)" class="btn-sm btn-outline">NEXT →</a>
+            }
+        </div>
+    }
+</div>
