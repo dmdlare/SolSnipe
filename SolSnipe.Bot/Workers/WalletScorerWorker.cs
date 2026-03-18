@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Quartz;
 using SolSnipe.Core.Interfaces;
 using SolSnipe.Core.Models;
+using static SolSnipe.Core.Interfaces.IWalletMonitor;
 
 namespace SolSnipe.Bot.Workers;
 

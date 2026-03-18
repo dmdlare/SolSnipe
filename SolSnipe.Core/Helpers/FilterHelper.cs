@@ -2,6 +2,7 @@
 using SolSnipe.Core.Interfaces;
 using SolSnipe.Core.Models;
 using Microsoft.Extensions.Options;
+using static SolSnipe.Core.Interfaces.IWalletMonitor;
 
 namespace SolSnipe.Core.Helpers;
 

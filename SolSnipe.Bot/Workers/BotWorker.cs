@@ -5,6 +5,7 @@ using SolSnipe.Core.Helpers;
 using SolSnipe.Core.Interfaces;
 using SolSnipe.Core.Models;
 using SolSnipe.Core.Services;
+using static SolSnipe.Core.Interfaces.IWalletMonitor;
 
 namespace SolSnipe.Bot.Workers;
 

@@ -8,14 +8,11 @@ using Microsoft.Extensions.Options;
 using Org.BouncyCastle.Asn1.Ocsp;
 using SolSnipe.Core.Interfaces;
 using SolSnipe.Core.Models;
+using static SolSnipe.Core.Interfaces.IWalletMonitor;
 
 namespace SolSnipe.Api.Controllers;
 
-/// <summary>
-/// Receives Helius webhook POST requests when tracked wallets transact.
-/// Helius enhanced transactions arrive pre-parsed with token transfer data.
-/// Register this URL at: https://dev.helius.xyz/dashboard/app → Webhooks
-/// </summary>
+
 [ApiController]
 [Route("webhook")]
 public class WebhookController : ControllerBase
@@ -66,10 +63,7 @@ public class WebhookController : ControllerBase
         return Ok();
     }
 
-    // -----------------------------------------------------------------------
-    // Private
-    // -----------------------------------------------------------------------
-
+   
     private void ProcessEvent(JsonElement evt)
     {
         // Helius enhanced transaction format

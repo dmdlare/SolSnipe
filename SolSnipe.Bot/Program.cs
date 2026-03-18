@@ -12,6 +12,7 @@ using SolSnipe.Core.Models;
 using SolSnipe.Core.Services;
 using SolSnipe.Data;
 using SolSnipe.Data.Repositories;
+using static SolSnipe.Core.Interfaces.IWalletMonitor;
 
 namespace SolSnipe.Bot;
 

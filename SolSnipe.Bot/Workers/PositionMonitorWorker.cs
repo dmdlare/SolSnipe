@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SolSnipe.Core.Interfaces;
 using SolSnipe.Core.Models;
+using static SolSnipe.Core.Interfaces.IWalletMonitor;
 
 namespace SolSnipe.Bot.Workers;
 public class PositionMonitorWorker : BackgroundService
