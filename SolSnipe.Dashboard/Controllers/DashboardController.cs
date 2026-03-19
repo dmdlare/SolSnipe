@@ -4,6 +4,7 @@ using SolSnipe.Core.Interfaces;
 using SolSnipe.Core.Models;
 using SolSnipe.Core.Services;
 using SolSnipe.Dashboard.Models;
+using static SolSnipe.Core.Interfaces.IWalletMonitor;
 
 namespace SolSnipe.Dashboard.Controllers;
 

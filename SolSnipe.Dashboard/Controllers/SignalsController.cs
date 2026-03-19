@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SolSnipe.Core.Interfaces;
 using SolSnipe.Dashboard.Models;
+using static SolSnipe.Core.Interfaces.IWalletMonitor;
 
 namespace SolSnipe.Dashboard.Controllers;
 

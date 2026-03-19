@@ -7,6 +7,7 @@ using SolSnipe.Dashboard;
 using SolSnipe.Dashboard.Hubs;
 using SolSnipe.Data;
 using SolSnipe.Data.Repositories;
+using static SolSnipe.Core.Interfaces.IWalletMonitor;
 
 var builder = WebApplication.CreateBuilder(args);
 
